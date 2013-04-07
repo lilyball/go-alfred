@@ -1,0 +1,50 @@
+# go-alfred
+
+This is a simple package for constructing the XML output for Alfred 2 workflow
+script filters.
+
+Example:
+
+    package main
+
+    import (
+        "fmt"
+        "github.com/kballard/go-alfred/alfred"
+        "os"
+    )
+
+    func main() {
+        items := make([]alfred.Item, 2)
+        items[0] = alfred.Item{
+            Title:    "Item 1",
+            Subtitle: "The first item",
+            Arg:      "Argument for next action",
+            Uid:      "com.example.go-alfred.uid:1", // must be some random uid
+            Valid:    true,
+            Icon: alfred.Icon{
+                Type:  alfred.IconTypeFileIcon,
+                Value: "/Applications/Calculator.app",
+            },
+        }
+        items[1] = alfred.Item{
+            Title:    "Item 2",
+            Subtitle: "The second item",
+            Arg:      "Another argument",
+            Uid:      "com.example.go-alfred.uid:2",
+            Valid:    true,
+            Icon: alfred.Icon{
+                Type:  alfred.IconTypeFileType,
+                Value: "public.folder",
+            },
+        }
+
+        bytes, err := alfred.Encode(items)
+        if err != nil {
+            fmt.Fprintln(os.Stderr, "Error encoding XML:", err)
+            os.Exit(1)
+        }
+        if _, err := os.Stdout.Write(bytes); err != nil {
+            fmt.Fprintln(os.Stderr, "Error writing XML:", err)
+            os.Exit(1)
+        }
+    }
