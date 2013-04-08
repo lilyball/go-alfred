@@ -9,32 +9,34 @@ const (
 )
 
 const (
+	IconTypePath     = "path"
 	IconTypeFileIcon = "fileicon"
 	IconTypeFileType = "filetype"
 )
 
 type Icon struct {
-	Type string `xml:"type,attr,omitempty"`
+	Type  string `xml:"type,attr,omitempty"`
 	Value string `xml:",chardata"`
 }
 
 type Item struct {
 	// Attributes
-	Uid   string `xml:"uid,attr,omitempty"`
-	Arg   string `xml:"arg,attr,omitempty"`
-	Valid bool   `xml:"-"`
+	Uid          string `xml:"uid,attr,omitempty"`
+	Arg          string `xml:"arg,attr,omitempty"`
+	Valid        bool   `xml:"-"`
 	Autocomplete string `xml:"autocomplete,attr,omitempty"`
-	Type string `xml:"type,attr,omitempty"`
+	Type         string `xml:"type,attr,omitempty"`
 
 	// Sub-elements
-	Title string `xml:"title"`
+	Title    string `xml:"title"`
 	Subtitle string `xml:"subtitle,omitempty"`
-	Icon Icon `xml:"icon"`
+	Icon     Icon `xml:"-"`
 }
 
 type item struct {
 	Item
 	XMLValid string `xml:"valid,attr"`
+	Icon     *Icon  `xml:"icon,omitempty"`
 }
 
 func Encode(items []Item) ([]byte, error) {
@@ -45,6 +47,12 @@ func Encode(items []Item) ([]byte, error) {
 			xmlitems[i].XMLValid = "YES"
 		} else {
 			xmlitems[i].XMLValid = "NO"
+		}
+		if item.Icon.Type != "" {
+			xmlitems[i].Icon = &item.Icon
+			if xmlitems[i].Icon.Type == IconTypePath {
+				xmlitems[i].Icon.Type = ""
+			}
 		}
 	}
 
